@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none; 
+}
+
+body {
+  font-family: 'Share Tech', sans-serif;
+  background: linear-gradient(135deg, #1c1c1c, #2f2f2f);
+  color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+/* Botões das abas */
+.tab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.tab-button {
+  padding: 12px 22px;
+  border: none;
+  background-color: #222;
+  color: #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Share Tech', sans-serif;
+}
+
+.tab-button:hover {
+  background-color: #333;
+  color: #f1c40f;
+}
+
+.tab-button.active {
+  background-color: #444;
+  color: #f1c40f;
+}
+
+/* Conteúdo das abas */
+.tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  padding: 30px;
+  border-radius: 16px;
+  background-color: #1e1e1e;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.3s ease-in-out;
+  font-family: 'Share Tech', sans-serif;
+}
+.tab-content button {
+
+    font-family: 'Share Tech', sans-serif;
+
+
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+.tab-content h2 {
+  font-size: 26px;
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+.tab-content p {
+  color: #bbb;
+  margin-bottom: 10px;
+  font-family: 'Share Tech', sans-serif;
+}
+
+
+
+label {
+  margin-top: 10px;
+}
+
+input[type="number"] {
+  padding: 8px 12px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  margin: 5px 5px 10px 5px;
+  background-color: #2c2c2c;
+  color: #fff;
+  width: 120px;
+  transition: background 0.3s;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  background-color: #3c3c3c;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #222;
+  color: #ccc;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #333;
+  color: #f1c40f;
+}
+
+/* Resultado */
+#resultadoTab1, #resultadoTab2, #resultadoTab3,
+#resultadoTab4, #resultadoTab5, #resultadoTab6 {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #f1c40f;
+}
+
+/* Navegação inferior */
+#nave {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#nave a {
+  text-decoration: none;
+  color: #ccc;
+  background-color: #1e1e1e;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+#nave a:hover {
+  background-color: #2c2c2c;
+  color: #f1c40f;
+}
+
+/* Animação */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

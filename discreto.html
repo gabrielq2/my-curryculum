@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Probabilidade</title>
+    <link rel="stylesheet" href="disc.css" />
+</head>
+<script src="titlebar.js"></script>
+
+<style>
+  #custom-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #222222, #2e2e2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    -webkit-app-region: drag;
+    /* permite arrastar a janela */
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    user-select: none;
+    font-family: 'Share Tech', monospace;
+  }
+
+  /* Botões da titlebar */
+  #custom-titlebar .titlebar-btn {
+    -webkit-app-region: no-drag;
+    background: transparent;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 10px;
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #333;
+    color: #f1c40f;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+</style>
+
+<body>
+  <!-- Barra de título customizada -->
+  <div id="custom-titlebar">
+    <button id="minimize" class="titlebar-btn" title="Minimizar">
+      <svg width="12" height="2" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg">
+        <rect width="12" height="2" fill="currentColor" />
+      </svg>
+    </button>
+    <button id="maximize" class="titlebar-btn" title="Maximizar">
+      <svg width="20" height="20" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </button>
+    <button id="close" class="titlebar-btn close-btn" title="Fechar">
+      <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+        <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" />
+        <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </button>
+  </div>
+
+    <div class="main-content" style="padding-top: 60px;">
+        
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab('tab1', this)">Média</button>
+            <button class="tab-button" onclick="openTab('tab2', this)">Variância</button>
+            <button class="tab-button" onclick="openTab('tab3', this)">Desvio Padrão</button>
+            <button class="tab-button" onclick="openTab('tab4', this)">Coeficiente de Variação</button>
+            <button class="tab-button" onclick="openTab('tab5', this)">Mediana</button>
+            <button class="tab-button" onclick="openTab('tab6', this)">Moda</button>
+        </div>
+
+        
+        <div id="tab1" class="tab tab-content active" style="display: block;">
+            <h2>Média</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab1">Quantidade:</label>
+            <input type="number" id="quantidadeTab1" name="quantidadeTab1" min="1" />
+            <button onclick="gerarCampos('tab1')">Gerar Campos</button>
+            <div id="camposNumerosTab1"></div>
+            <button onclick="calcularMedia()">Calcular Média</button>
+            <p id="resultadoTab1"></p>
+        </div>
+
+        <div id="tab2" class="tab tab-content" style="display: none;">
+            <h2>Variância</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab2">Quantidade:</label>
+            <input type="number" id="quantidadeTab2" name="quantidadeTab2" min="1" />
+            <button onclick="gerarCampos('tab2')">Gerar Campos</button>
+            <div id="camposNumerosTab2"></div>
+            <button onclick="calcularVariancia()">Calcular Variância</button>
+            <p id="resultadoTab2"></p>
+        </div>
+
+        <div id="tab3" class="tab tab-content" style="display: none;">
+            <h2>Desvio Padrão</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab3">Quantidade:</label>
+            <input type="number" id="quantidadeTab3" name="quantidadeTab3" min="1" />
+            <button onclick="gerarCampos('tab3')">Gerar Campos</button>
+            <div id="camposNumerosTab3"></div>
+            <button onclick="calcularDesvio()">Calcular Desvio</button>
+            <p id="resultadoTab3"></p>
+        </div>
+
+        <div id="tab4" class="tab tab-content" style="display: none;">
+            <h2>Coeficiente de Variação</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab4">Quantidade:</label>
+            <input type="number" id="quantidadeTab4" name="quantidadeTab4" min="1" />
+            <button onclick="gerarCampos('tab4')">Gerar Campos</button>
+            <div id="camposNumerosTab4"></div>
+            <button onclick="calcularCV()">Calcular Coeficiente</button>
+            <p id="resultadoTab4"></p>
+        </div>
+
+        <div id="tab5" class="tab tab-content" style="display: none;">
+            <h2>Mediana</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab5">Quantidade:</label>
+            <input type="number" id="quantidadeTab5" name="quantidadeTab5" min="1" />
+            <button onclick="gerarCampos('tab5')">Gerar Campos</button>
+            <div id="camposNumerosTab5"></div>
+            <button onclick="calcularMediana()">Calcular Mediana</button>
+            <p id="resultadoTab5"></p>
+        </div>
+
+        <div id="tab6" class="tab tab-content" style="display: none;">
+            <h2>Moda</h2>
+            <p>Quantos números deseja calcular?</p>
+            <label for="quantidadeTab6">Quantidade:</label>
+            <input type="number" id="quantidadeTab6" name="quantidadeTab6" min="1" />
+            <button onclick="gerarCampos('tab6')">Gerar Campos</button>
+            <div id="camposNumerosTab6"></div>
+            <button onclick="calcularModa()">Calcular Moda</button>
+            <p id="resultadoTab6"></p>
+        </div>
+    </div>
+
+    <nav id="nave">
+        <a href="classe.html">Agrupamento em Classe</a>
+        <a href="probabilidade.html">Probabilidade</a>
+        <a href="index.html">Página Inicial</a>
+    </nav>
+
+    <script>
+        
+
+        function openTab(tabName, element) {
+            var i, tabcontent, tabbuttons;
+            tabcontent = document.getElementsByClassName("tab");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+            }
+            var currentTab = document.getElementById(tabName);
+            currentTab.style.display = "block";
+            setTimeout(() => {
+                currentTab.classList.add("active");
+            }, 10);
+
+            
+            for (let n = 1; n <= 6; n++) {
+                document.getElementById("tab" + n + "-campos").innerHTML = '';
+                document.getElementById("tab" + n + "-resultado").innerText = '';
+            }
+
+            element.className += " active";
+        }
+
+        function gerarCampos(tabId) {
+            var quantidade;
+            var camposNumeros;
+
+            if (tabId === 'tab1') {
+                quantidade = document.getElementById("quantidadeTab1").value;
+                camposNumeros = document.getElementById("camposNumerosTab1");
+            } else if (tabId === 'tab2') {
+                quantidade = document.getElementById("quantidadeTab2").value;
+                camposNumeros = document.getElementById("camposNumerosTab2");
+            } else if (tabId === 'tab3') {
+                quantidade = document.getElementById("quantidadeTab3").value;
+                camposNumeros = document.getElementById("camposNumerosTab3");
+            } else if (tabId === 'tab4') {
+                quantidade = document.getElementById("quantidadeTab4").value;
+                camposNumeros = document.getElementById("camposNumerosTab4");
+            } else if (tabId === 'tab5') {
+                quantidade = document.getElementById("quantidadeTab5").value;
+                camposNumeros = document.getElementById("camposNumerosTab5");
+            } else if (tabId === 'tab6') {
+                quantidade = document.getElementById("quantidadeTab6").value;
+                camposNumeros = document.getElementById("camposNumerosTab6");
+            }
+
+            camposNumeros.innerHTML = '';
+
+            const LIMITE_LABELS = 10;
+            const camposVisiveis = Math.min(quantidade, LIMITE_LABELS);
+
+            for (let i = 0; i < camposVisiveis; i++) {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.className = "numero";
+                input.placeholder = "Número " + (i + 1);
+
+                const frequencia = document.createElement("input");
+                frequencia.type = "number";
+                frequencia.className = "frequenciaabs";
+                frequencia.placeholder = "fi " + (i + 1);
+
+                camposNumeros.appendChild(input);
+                camposNumeros.appendChild(frequencia);
+                camposNumeros.appendChild(document.createElement("br"));
+            }
+
+            if (quantidade > LIMITE_LABELS) {
+                const aviso = document.createElement("p");
+                aviso.style.color = "#f1c40f";
+                aviso.textContent = `Limite de ${LIMITE_LABELS} dados atingido.`;
+                camposNumeros.appendChild(aviso);
+            }
+        }
+
+        function calcularMedia() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+
+            if (numeros.every(num => !isNaN(num))) {
+                var soma = numeros.reduce((acc, num) => acc + num, 0);
+                var media = soma / numeros.length;
+                document.getElementById("resultadoTab1").innerText = "Média: " + media.toFixed(2);
+            } else {
+                document.getElementById("resultadoTab1").innerText = "Por favor, insira números válidos.";
+            }
+        }
+
+        function calcularVariancia() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+            var inputsFrequencias = document.getElementsByClassName("frequenciaabs");
+            var frequencias = Array.from(inputsFrequencias).map(input => Number(input.value));
+
+            if (numeros.every(num => !isNaN(num)) && frequencias.every(freq => !isNaN(freq))) {
+                var somaFrequencias = frequencias.reduce((acc, freq) => acc + freq, 0);
+                var media = numeros.reduce((acc, num, index) => acc + num * frequencias[index], 0) / somaFrequencias;
+
+                var variancia = numeros.reduce((acc, num, index) => acc + frequencias[index] * Math.pow(num - media, 2), 0) / somaFrequencias;
+
+                document.getElementById("resultadoTab2").innerText = "Variância: " + variancia.toFixed(2);
+            } else {
+                document.getElementById("resultadoTab2").innerText = "Por favor, insira números e frequências válidos.";
+            }
+        }
+
+        function calcularDesvio() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+            var inputsFrequencias = document.getElementsByClassName("frequenciaabs");
+            var frequencias = Array.from(inputsFrequencias).map(input => Number(input.value));
+
+            if (numeros.every(num => !isNaN(num)) && frequencias.every(freq => !isNaN(freq))) {
+                var somaFrequencias = frequencias.reduce((acc, freq) => acc + freq, 0);
+                var media = numeros.reduce((acc, num, index) => acc + num * frequencias[index], 0) / somaFrequencias;
+
+                var variancia = numeros.reduce((acc, num, index) => acc + frequencias[index] * Math.pow(num - media, 2), 0) / somaFrequencias;
+
+                var desvio = Math.sqrt(variancia);
+
+                document.getElementById("resultadoTab3").innerText = "Desvio Padrão: " + desvio.toFixed(2);
+            } else {
+                document.getElementById("resultadoTab3").innerText = "Por favor, insira números e frequências válidos.";
+            }
+        }
+
+        function calcularCV() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+            var inputsFrequencias = document.getElementsByClassName("frequenciaabs");
+            var frequencias = Array.from(inputsFrequencias).map(input => Number(input.value));
+
+            if (numeros.every(num => !isNaN(num)) && frequencias.every(freq => !isNaN(freq))) {
+                var somaFrequencias = frequencias.reduce((acc, freq) => acc + freq, 0);
+                var media = numeros.reduce((acc, num, index) => acc + num * frequencias[index], 0) / somaFrequencias;
+
+                var variancia = numeros.reduce((acc, num, index) => acc + frequencias[index] * Math.pow(num - media, 2), 0) / somaFrequencias;
+
+                var desvio = Math.sqrt(variancia);
+                var cv = (desvio / media) * 100;
+
+                document.getElementById("resultadoTab4").innerText = "Coeficiente de Variação: " + cv.toFixed(2) + "%";
+            } else {
+                document.getElementById("resultadoTab4").innerText = "Por favor, insira números e frequências válidos.";
+            }
+        }
+
+        function calcularMediana() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var inputsFrequencias = document.getElementsByClassName("frequenciaabs");
+
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+            var frequencias = Array.from(inputsFrequencias).map(input => Number(input.value));
+
+            if (
+                numeros.length > 0 &&
+                frequencias.length > 0 &&
+                numeros.every(num => !isNaN(num)) &&
+                frequencias.every(freq => !isNaN(freq))
+            ) {
+                var acumulada = [];
+                var somaFrequencias = frequencias.reduce((sum, freq) => sum + freq, 0);
+                acumulada.push(frequencias[0]);
+                for (var i = 1; i < frequencias.length; i++) {
+                    acumulada.push(acumulada[i - 1] + frequencias[i]);
+                }
+
+                var metade = somaFrequencias / 2;
+                var mediana;
+                for (var i = 0; i < acumulada.length; i++) {
+                    if (acumulada[i] >= metade) {
+                        if (i === 0) {
+                            mediana = numeros[i];
+                        } else {
+                            mediana = (numeros[i - 1] + numeros[i]) / 2;
+                        }
+                        break;
+                    }
+                }
+
+                document.getElementById("resultadoTab5").innerText = "Mediana: " + mediana.toFixed(2);
+            } else {
+                document.getElementById("resultadoTab5").innerText = "Por favor, insira números e frequências válidos.";
+            }
+        }
+
+        function calcularModa() {
+            var inputsNumeros = document.getElementsByClassName("numero");
+            var inputsFrequencias = document.getElementsByClassName("frequenciaabs");
+
+            var numeros = Array.from(inputsNumeros).map(input => Number(input.value));
+            var frequencias = Array.from(inputsFrequencias).map(input => Number(input.value));
+
+            if (
+                numeros.length > 0 &&
+                frequencias.length > 0 &&
+                numeros.every(num => !isNaN(num)) &&
+                frequencias.every(freq => !isNaN(freq))
+            ) {
+                var maiorFrequencia = Math.max(...frequencias);
+
+                var modas = [];
+                for (var i = 0; i < frequencias.length; i++) {
+                    if (frequencias[i] === maiorFrequencia) {
+                        modas.push(numeros[i]);
+                    }
+                }
+
+                if (modas.length > 1) {
+                    if (modas.length < frequencias.length) {
+                        document.getElementById("resultadoTab6").innerText = "Moda(s) (multimodal): " + modas.join(", ");
+                    } else if (modas.length === frequencias.length) {
+                        document.getElementById("resultadoTab6").innerText = "O conjunto é amodal.";
+                    }
+                } else {
+                    document.getElementById("resultadoTab6").innerText = "Moda: " + modas[0];
+                }
+            } else {
+                document.getElementById("resultadoTab6").innerText = "Por favor, insira números e frequências válidos.";
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distribuições: Uniforme e Exponencial</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <link rel="stylesheet" href="disc.css" />
+</head>
+<script src="titlebar.js"></script>
+<style>
+  #custom-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #222222, #2e2e2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    -webkit-app-region: drag;
+    /* permite arrastar a janela */
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    user-select: none;
+    font-family: 'Share Tech', monospace;
+  }
+
+  /* Botões da titlebar */
+  #custom-titlebar .titlebar-btn {
+    -webkit-app-region: no-drag;
+    background: transparent;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 10px;
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #333;
+    color: #f1c40f;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+</style>
+
+</head>
+<script src="titlebar.js"></script>
+
+<body>
+
+  <div id="custom-titlebar">
+    <button id="minimize" class="titlebar-btn" title="Minimizar">_</button>
+    <button id="maximize" class="titlebar-btn" title="Maximizar">☐</button>
+    <button id="close" class="titlebar-btn close-btn" title="Fechar">X</button>
+  </div>
+
+  <div class="main-content" style="padding-top: 60px;">
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="openTab('tab1', this)">Distribuição Uniforme</button>
+      <button class="tab-button" onclick="openTab('tab2', this)">Distribuição Exponencial</button>
+    </div>
+
+    <div id="tab1" class="tab tab-content active" style="display: block;">
+      <h3>Distribuição Uniforme</h3>
+      <label for="a">A: </label><input type="number" id="a">
+      <label for="b">B: </label><input type="number" id="b">
+      <br><br>
+
+      
+      <button onclick="mostrarMedia()">Média</button>
+      <button onclick="mostrarVariancia()">Variância</button>
+      <button onclick="mostrarDesvio()">Desvio Padrão</button>
+      <button onclick="mostrarCV()">Coeficiente de Variação</button>
+      <button onclick="mostrarTudo()">Mostrar Tudo</button>
+
+      <br><br>
+      <button onclick="mostrarCamposProbabilidade()">Probabilidade</button>
+
+      
+      <div id="probabilidadeCampos" style="margin-top:10px;">
+        <label for="c">C: </label><input type="number" id="c">
+        <label for="d">D: </label><input type="number" id="d">
+        <br><br>
+        <button id="btnProbMenor" onclick="calcularProbabilidadeUniforme('Menor')">x < C</button>
+            <button id="btnProbMaior" onclick="calcularProbabilidadeUniforme('Maior')">x > C</button>
+            <button id="btnProbEntre" onclick="calcularProbabilidadeUniforme('Entre')">C < x < D</button>
+      </div>
+
+      <br>
+      <button onclick="limparUniforme()">Limpar</button>
+    </div>
+
+    <div id="tab2" class="tab tab-content" style="display: none;">
+      <h3>Distribuição Exponencial</h3>
+      <label for="media">Média (μ): </label><input type="number" id="media" placeholder="Ex: 2">
+      <label for="a_exp">a: </label><input type="number" id="a_exp" placeholder="Ex: 2">
+      <label for="b_exp">b (opcional): </label><input type="number" id="b_exp" placeholder="Ex: 5">
+      <br><br>
+      <button onclick="calcularExponencial('Maior')">P(X > a)</button>
+      <button onclick="calcularExponencial('Menor')">P(X < a)</button>
+          <button onclick="calcularExponencial('Entre')">P(a < X < b)</button>
+              <button onclick="limparExponencial()">Limpar</button>
+    </div>
+  </div>
+
+  <br>
+  <button onclick="resetarZoom()">Resetar Zoom</button>
+  <hr>
+  <div id="res" style="text-align: center;"></div>
+  <canvas id="grafico" style="display: none; width: 100%; max-height: 250px;"></canvas>
+
+  <script>
+    let chartInstance = null;
+
+    function openTab(tabName, element) {
+      var i, tabcontent, tabbuttons;
+      tabcontent = document.getElementsByClassName("tab");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabcontent[i].classList.remove("active");
+      }
+      tabbuttons = document.getElementsByClassName("tab-button");
+      for (i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+      }
+      var currentTab = document.getElementById(tabName);
+      currentTab.style.display = "block";
+      element.className += " active";
+
+      document.getElementById('res').innerHTML = '';
+      document.getElementById('grafico').style.display = 'none';
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      document.getElementById('a').value = '';
+      document.getElementById('b').value = '';
+      document.getElementById('c').value = '';
+      document.getElementById('d').value = '';
+      document.getElementById('media').value = '';
+      document.getElementById('a_exp').value = '';
+      document.getElementById('b_exp').value = '';
+      esconderCamposProbabilidade();
+    }
+
+    function gerarGrafico(titulo, labels, data, sombra = null) {
+      const ctx = document.getElementById('grafico').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+      const datasets = [{ label: titulo, data: data, borderColor: '#3498db', borderWidth: 2, fill: false, tension: 0.1, pointRadius: 0 }];
+      if (sombra) {
+        datasets.push({ label: 'Área da Probabilidade', data: sombra, backgroundColor: 'rgba(52, 152, 219, 0.4)', borderWidth: 0, pointRadius: 0, fill: true });
+      }
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true, scales: {
+            x: { title: { display: true, text: 'x' }, ticks: { color: '#f0f0f0' }, grid: { color: '#333' } },
+            y: { title: { display: true, text: 'f(x)' }, ticks: { color: '#f0f0f0' }, grid: { color: '#333' } }
+          },
+          plugins: {
+            legend: { labels: { color: '#f0f0f0' } },
+            tooltip: { mode: 'index', intersect: false },
+            zoom: { zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' }, pan: { enabled: true, mode: 'xy', threshold: 5 } }
+          }
+        }
+      });
+      document.getElementById('grafico').style.display = 'block';
+    }
+
+    function resetarZoom() { if (chartInstance) chartInstance.resetZoom(); }
+
+    
+
+    function mostrarMedia() {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      const media = (A + B) / 2;
+      document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Média: ${media.toFixed(2)}</p>`;
+    }
+
+    function mostrarVariancia() {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      const variancia = Math.pow(B - A, 2) / 12;
+      document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Variância: ${variancia.toFixed(2)}</p>`;
+    }
+
+    function mostrarDesvio() {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      const desvio = Math.sqrt(Math.pow(B - A, 2) / 12);
+      document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Desvio Padrão: ${desvio.toFixed(2)}</p>`;
+    }
+
+    function mostrarCV() {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      const media = (A + B) / 2;
+      const desvio = Math.sqrt(Math.pow(B - A, 2) / 12);
+      const cv = (desvio / media) * 100;
+      document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Coeficiente de Variação: ${cv.toFixed(2)}%</p>`;
+    }
+
+    function mostrarTudo() {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      const media = (A + B) / 2;
+      const variancia = Math.pow(B - A, 2) / 12;
+      const desvio = Math.sqrt(variancia);
+      const cv = (desvio / media) * 100;
+
+      document.getElementById('res').innerHTML = `
+        <p style="font-size: 28px;">Média: ${media.toFixed(2)}</p>
+        <p style="font-size: 28px;">Variância: ${variancia.toFixed(2)}</p>
+        <p style="font-size: 28px;">Desvio Padrão: ${desvio.toFixed(2)}</p>
+        <p style="font-size: 28px;">Coeficiente de Variação: ${cv.toFixed(2)}%</p>
+      `;
+    }
+
+    function mostrarCamposProbabilidade() {
+      document.getElementById('probabilidadeCampos').style.display = 'block';
+      document.getElementById('btnProbMenor').style.display = 'inline-block';
+      document.getElementById('btnProbMaior').style.display = 'inline-block';
+      document.getElementById('btnProbEntre').style.display = 'inline-block';
+      document.getElementById('res').innerHTML = '';
+    }
+
+    function esconderCamposProbabilidade() {
+      document.getElementById('probabilidadeCampos').style.display = 'none';
+      document.getElementById('btnProbMenor').style.display = 'none';
+      document.getElementById('btnProbMaior').style.display = 'none';
+      document.getElementById('btnProbEntre').style.display = 'none';
+    }
+
+    function validarCDDentroIntervalo(A, B, C, D) {
+      if (C < A || C > B) {
+        document.getElementById('res').innerHTML = `<p style="color: red; font-size: 28px;">Erro: C deve estar entre A e B.</p>`;
+        return false;
+      }
+      if (D < A || D > B) {
+        document.getElementById('res').innerHTML = `<p style="color: red; font-size: 28px;">Erro: D deve estar entre A e B.</p>`;
+        return false;
+      }
+      if (C > D) {
+        document.getElementById('res').innerHTML = `<p style="color: red; font-size: 28px;">Erro: C não pode ser maior que D.</p>`;
+        return false;
+      }
+      return true;
+    }
+
+    function calcularProbabilidadeUniforme(tipo) {
+      const A = Number(document.getElementById('a').value);
+      const B = Number(document.getElementById('b').value);
+      const C = Number(document.getElementById('c').value);
+      const D = Number(document.getElementById('d').value);
+
+      if (A >= B || isNaN(A) || isNaN(B)) {
+        document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Verifique se A e B são números válidos e A < B.</p>';
+        return;
+      }
+
+      if (tipo !== 'Maior' && tipo !== 'Menor' && tipo !== 'Entre') return;
+
+      if (tipo === 'Entre') {
+        if (isNaN(C) || isNaN(D)) {
+          document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Informe C e D corretamente para C < x < D.</p>';
+          return;
+        }
+        if (!validarCDDentroIntervalo(A, B, C, D)) return;
+
+        const prob = 100 * ((D - C) / (B - A));
+        document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Probabilidade (${C} < X < ${D}) = ${prob.toFixed(2)}%</p>`;
+      } else {
+        if (isNaN(C)) {
+          document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Informe C corretamente.</p>';
+          return;
+        }
+        if (C < A || C > B) {
+          document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: C deve estar entre A e B.</p>';
+          return;
+        }
+
+        if (tipo === 'Menor') {
+          const prob = 100 * ((C - A) / (B - A));
+          document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Probabilidade (X < ${C}) = ${prob.toFixed(2)}%</p>`;
+        } else if (tipo === 'Maior') {
+          const prob = 100 * ((B - C) / (B - A));
+          document.getElementById('res').innerHTML = `<p style="font-size: 28px;">Probabilidade (X > ${C}) = ${prob.toFixed(2)}%</p>`;
+        }
+      }
+    }
+
+    function limparUniforme() {
+      document.getElementById('a').value = '';
+      document.getElementById('b').value = '';
+      document.getElementById('c').value = '';
+      document.getElementById('d').value = '';
+      document.getElementById('res').innerHTML = '';
+      esconderCamposProbabilidade();
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+      document.getElementById('grafico').style.display = 'none';
+    }
+
+    
+    function calcularExponencial(tipo) {
+      const media = Number(document.getElementById('media').value);
+      const a = Number(document.getElementById('a_exp').value);
+      const b = Number(document.getElementById('b_exp').value);
+      if (isNaN(media) || media <= 0) { document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Informe média > 0.</p>'; return; }
+      if (isNaN(a)) { document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Informe a corretamente.</p>'; return; }
+      if (tipo === 'Entre' && (isNaN(b) || b <= a)) { document.getElementById('res').innerHTML = '<p style="color: red; font-size: 28px;">Erro: Informe b > a para o intervalo.</p>'; return; }
+      const lambda = 1 / media; let resultado = 0; let sombra = [];
+      if (tipo === 'Maior') { resultado = Math.exp(-lambda * a); sombra = Array.from({ length: 100 }, (_, i) => { const x = i * media * 0.05; return x >= a ? lambda * Math.exp(-lambda * x) : null; }); document.getElementById('res').innerHTML = `<p style="font-size: 28px;">P(X > ${a}) = ${(resultado * 100).toFixed(2)}%</p>`; }
+      else if (tipo === 'Menor') { resultado = 1 - Math.exp(-lambda * a); sombra = Array.from({ length: 100 }, (_, i) => { const x = i * media * 0.05; return x <= a ? lambda * Math.exp(-lambda * x) : null; }); document.getElementById('res').innerHTML = `<p style="font-size: 28px;">P(X < ${a}) = ${(resultado * 100).toFixed(2)}%</p>`; }
+      else if (tipo === 'Entre') { resultado = Math.exp(-lambda * a) - Math.exp(-lambda * b); sombra = Array.from({ length: 100 }, (_, i) => { const x = i * media * 0.05; return (x >= a && x <= b) ? lambda * Math.exp(-lambda * x) : null; }); document.getElementById('res').innerHTML = `<p style="font-size: 28px;">P(${a} < X < ${b}) = ${(resultado * 100).toFixed(2)}%</p>`; }
+      const xData = Array.from({ length: 100 }, (_, i) => (i * media * 0.05).toFixed(2));
+      const yData = xData.map(x => (lambda * Math.exp(-lambda * x)).toFixed(4));
+      gerarGrafico(`f(x) = ${lambda.toFixed(3)}e^(-${lambda.toFixed(3)}x)`, xData, yData, sombra);
+    }
+
+    function limparExponencial() {
+      document.getElementById('media').value = '';
+      document.getElementById('a_exp').value = '';
+      document.getElementById('b_exp').value = '';
+      document.getElementById('res').innerHTML = '';
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+      document.getElementById('grafico').style.display = 'none';
+    }
+
+
+  </script>
+</body>
+
+</html>
+

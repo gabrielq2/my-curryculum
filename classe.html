@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Probabilidade - Agrupamento em Classes</title>
+  <link rel="stylesheet" href="disc.css" />
+</head>
+<script src="titlebar.js"></script>
+
+<style>
+  #custom-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #222222, #2e2e2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    -webkit-app-region: drag;
+    /* permite arrastar a janela */
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    user-select: none;
+    font-family: 'Share Tech', monospace;
+  }
+
+  /* Botões da titlebar */
+  #custom-titlebar .titlebar-btn {
+    -webkit-app-region: no-drag;
+    background: transparent;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 10px;
+    height: 30px;
+    width: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #333;
+    color: #f1c40f;
+  }
+
+  #custom-titlebar .titlebar-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+
+  #custom-titlebar .close-btn:hover {
+    background-color: #f1c40f;
+    color: #222;
+  }
+</style>
+
+<body>
+  <!-- Barra de título customizada -->
+  <div id="custom-titlebar">
+    <button id="minimize" class="titlebar-btn" title="Minimizar">
+      <svg width="12" height="2" viewBox="0 0 12 2" xmlns="http://www.w3.org/2000/svg">
+        <rect width="12" height="2" fill="currentColor" />
+      </svg>
+    </button>
+    <button id="maximize" class="titlebar-btn" title="Maximizar">
+      <svg width="20" height="20" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </button>
+    <button id="close" class="titlebar-btn close-btn" title="Fechar">
+      <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+        <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" />
+        <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="main-content scroll-area" style="padding-top: 60px;">
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="openTab('tab1', this)">Média</button>
+      <button class="tab-button" onclick="openTab('tab2', this)">Variância</button>
+      <button class="tab-button" onclick="openTab('tab3', this)">Desvio Padrão</button>
+      <button class="tab-button" onclick="openTab('tab4', this)">Coeficiente de Variação</button>
+      <button class="tab-button" onclick="openTab('tab5', this)">Mediana</button>
+      <button class="tab-button" onclick="openTab('tab6', this)">Moda</button>
+      <button class="tab-button" onclick="openTab('tab7', this)">Moda de Czuber</button>
+    </div>
+
+    <div id="tab1" class="tab tab-content active" style="display: block;">
+      <label for="tab1-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab1-qtd" min="1" />
+      <br />
+
+      <label for="tab1-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab1-primeiro" />
+      <br />
+
+      <label for="tab1-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab1-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab1')">Gerar campos de frequências</button>
+      <div id="tab1-campos"></div>
+
+      <button onclick="calcularMedia()">Calcular Média</button>
+      <p id="tab1-resultado"></p>
+    </div>
+
+    <div id="tab2" class="tab tab-content" style="display: none;">
+      <label for="tab2-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab2-qtd" min="1" />
+      <br />
+
+      <label for="tab2-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab2-primeiro" />
+      <br />
+
+      <label for="tab2-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab2-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab2')">Gerar campos de frequências</button>
+      <div id="tab2-campos"></div>
+
+      <button onclick="calcularVariancia()">Calcular Variância</button>
+      <p id="tab2-resultado"></p>
+    </div>
+
+    <div id="tab3" class="tab tab-content" style="display: none;">
+      <label for="tab3-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab3-qtd" min="1" />
+      <br />
+
+      <label for="tab3-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab3-primeiro" />
+      <br />
+
+      <label for="tab3-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab3-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab3')">Gerar campos de frequências</button>
+      <div id="tab3-campos"></div>
+
+      <button onclick="calcularDesvio()">Calcular Desvio</button>
+      <p id="tab3-resultado"></p>
+    </div>
+
+    <div id="tab4" class="tab tab-content" style="display: none;">
+      <label for="tab4-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab4-qtd" min="1" />
+      <br />
+
+      <label for="tab4-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab4-primeiro" />
+      <br />
+
+      <label for="tab4-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab4-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab4')">Gerar campos de frequências</button>
+      <div id="tab4-campos"></div>
+
+      <button onclick="calcularCV()">Calcular Coeficiente</button>
+      <p id="tab4-resultado"></p>
+    </div>
+
+    <div id="tab5" class="tab tab-content" style="display: none;">
+      <label for="tab5-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab5-qtd" min="1" />
+      <br />
+
+      <label for="tab5-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab5-primeiro" />
+      <br />
+
+      <label for="tab5-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab5-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab5')">Gerar campos de frequências</button>
+      <div id="tab5-campos"></div>
+
+      <button onclick="calcularMediana()">Calcular Mediana</button>
+      <p id="tab5-resultado"></p>
+    </div>
+
+    <div id="tab6" class="tab tab-content" style="display: none;">
+      <label for="tab6-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab6-qtd" min="1" />
+      <br />
+
+      <label for="tab6-primeiro">Primeiro valor da classe (limite inferior da 1ª classe):</label>
+      <input type="number" id="tab6-primeiro" />
+      <br />
+
+      <label for="tab6-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab6-passo" />
+      <br />
+
+      <button onclick="gerarCampos('tab6')">Gerar campos de frequências</button>
+      <div id="tab6-campos"></div>
+
+      <button onclick="calcularModa()">Calcular Moda</button>
+      <p id="tab6-resultado"></p>
+    </div>
+
+    <div id="tab7" class="tab tab-content" style="display:none;">
+      <label for="tab7-qtd">Quantidade de Classes:</label>
+      <input type="number" id="tab7-qtd" min="1" />
+      <br />
+      <label for="tab7-primeiro">Primeiro valor da classe (limite inferior):</label>
+      <input type="number" id="tab7-primeiro" />
+      <br />
+      <label for="tab7-passo">Passo / Amplitude da classe:</label>
+      <input type="number" id="tab7-passo" />
+      <br />
+      <button onclick="gerarCampos('tab7')">Gerar campos de frequências</button>
+      <div id="tab7-campos"></div>
+      <button onclick="calcularModaCzuber()">Calcular Moda de Czuber</button>
+      <p id="tab7-resultado"></p>
+    </div>
+  </div>
+
+  <nav id="nave">
+    <a href="discreto.html">Agrupamento Discreto</a>
+    <a href="probabilidade.html">Probabilidade</a>
+    <a href="index.html">Página Inicial</a>
+  </nav>
+
+  <script>
+    function openTab(tabName, element) {
+      var i, tabcontent, tabbuttons;
+      tabcontent = document.getElementsByClassName("tab");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabcontent[i].classList.remove("active");
+      }
+      tabbuttons = document.getElementsByClassName("tab-button");
+      for (i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+      }
+      var currentTab = document.getElementById(tabName);
+      currentTab.style.display = "block";
+      setTimeout(() => {
+        currentTab.classList.add("active");
+      }, 10);
+
+      for (let n = 1; n <= 7; n++) {
+        document.getElementById("tab" + n + "-campos").innerHTML = '';
+        document.getElementById("tab" + n + "-resultado").innerText = '';
+      }
+
+      element.className += " active";
+    }
+
+    function gerarCampos(tabId) {
+      const qtd = Number(document.getElementById(tabId + "-qtd").value);
+      const primeiro = Number(document.getElementById(tabId + "-primeiro").value);
+      const passo = Number(document.getElementById(tabId + "-passo").value);
+
+      if (isNaN(qtd) || isNaN(primeiro) || isNaN(passo) || qtd <= 0 || passo <= 0) {
+        alert("Por favor, insira valores válidos para quantidade, primeiro valor e passo.");
+        return;
+      }
+
+      const container = document.getElementById(tabId + "-campos");
+      container.innerHTML = '';
+
+      for (let i = 0; i < qtd; i++) {
+        const li = primeiro + i * passo;
+        const ls = li + passo;
+        const marca = li + passo / 2;
+
+        const label = document.createElement("label");
+        label.textContent = `Frequência da classe [${li} - ${ls}): (PMI = ${marca.toFixed(2)})`;
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = 0;
+        input.className = "frequenciaabs";
+        input.placeholder = `fi da classe ${i + 1}`;
+        input.style.marginLeft = "10px";
+        input.setAttribute("data-pmi", marca);
+
+        container.appendChild(label);
+        container.appendChild(input);
+        container.appendChild(document.createElement("br"));
+        container.appendChild(document.createElement("br"));
+      }
+
+      document.getElementById(tabId + "-resultado").innerText = '';
+    }
+
+    function pegarDados(tabId) {
+      const container = document.getElementById(tabId + "-campos");
+      const inputs = container.querySelectorAll("input.frequenciaabs");
+      const frequencias = [];
+      const pmi = [];
+
+      for (const input of inputs) {
+        const fi = Number(input.value);
+        const marca = Number(input.getAttribute("data-pmi"));
+        if (isNaN(fi) || fi < 0) {
+          alert("Por favor, preencha todas as frequências com valores válidos (>=0).");
+          return null;
+        }
+        frequencias.push(fi);
+        pmi.push(marca);
+      }
+
+      return { frequencias, pmi };
+    }
+
+    function calcularMedia() {
+      const tab = "tab1";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const somaF = frequencias.reduce((a, b) => a + b, 0);
+      if (somaF === 0) {
+        alert("A soma das frequências não pode ser zero.");
+        return;
+      }
+      const somaPond = frequencias.reduce((a, b, i) => a + b * pmi[i], 0);
+      const media = somaPond / somaF;
+
+      document.getElementById(tab + "-resultado").innerText = `Média: ${media.toFixed(2)}`;
+    }
+
+    function calcularVariancia() {
+      const tab = "tab2";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const somaF = frequencias.reduce((a, b) => a + b, 0);
+      if (somaF === 0) {
+        alert("A soma das frequências não pode ser zero.");
+        return;
+      }
+
+      const media = frequencias.reduce((a, b, i) => a + b * pmi[i], 0) / somaF;
+      const variancia =
+        frequencias.reduce((a, b, i) => a + b * (pmi[i] - media) ** 2, 0) / somaF;
+
+      document.getElementById(tab + "-resultado").innerText = `Variância: ${variancia.toFixed(2)}`;
+    }
+
+    function calcularDesvio() {
+      const tab = "tab3";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const somaF = frequencias.reduce((a, b) => a + b, 0);
+      if (somaF === 0) {
+        alert("A soma das frequências não pode ser zero.");
+        return;
+      }
+
+      const media = frequencias.reduce((a, b, i) => a + b * pmi[i], 0) / somaF;
+      const variancia =
+        frequencias.reduce((a, b, i) => a + b * (pmi[i] - media) ** 2, 0) / somaF;
+      const desvio = Math.sqrt(variancia);
+
+      document.getElementById(tab + "-resultado").innerText = `Desvio Padrão: ${desvio.toFixed(2)}`;
+    }
+
+    function calcularCV() {
+      const tab = "tab4";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const somaF = frequencias.reduce((a, b) => a + b, 0);
+      if (somaF === 0) {
+        alert("A soma das frequências não pode ser zero.");
+        return;
+      }
+
+      const media = frequencias.reduce((a, b, i) => a + b * pmi[i], 0) / somaF;
+      const variancia =
+        frequencias.reduce((a, b, i) => a + b * (pmi[i] - media) ** 2, 0) / somaF;
+      const desvio = Math.sqrt(variancia);
+      const cv = (desvio / media) * 100;
+
+      document.getElementById(tab + "-resultado").innerText = `Coeficiente de Variação: ${cv.toFixed(2)}%`;
+    }
+
+    function calcularMediana() {
+      const tab = "tab5";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const somaF = frequencias.reduce((a, b) => a + b, 0);
+      if (somaF === 0) {
+        alert("A soma das frequências não pode ser zero.");
+        return;
+      }
+
+      const acumuladas = [];
+      frequencias.reduce((a, b, i) => (acumuladas[i] = a + b), 0);
+
+      const metade = somaF / 2;
+      let indiceMediana = acumuladas.findIndex((v) => v >= metade);
+
+      const fm = frequencias[indiceMediana];
+      const passo = pmi[1] - pmi[0] || 1;
+      const L = pmi[indiceMediana] - passo / 2;
+      const F = indiceMediana === 0 ? 0 : acumuladas[indiceMediana - 1];
+      const h = passo;
+
+      const mediana = L + ((metade - F) / fm) * h;
+
+      document.getElementById(tab + "-resultado").innerText = `Mediana: ${mediana.toFixed(2)}`;
+    }
+    function calcularModa() {
+      const tab = "tab6"; 
+      const dados = pegarDados(tab);
+      if (!dados) return;
+
+      const { frequencias, pmi } = dados;
+
+      const fm = Math.max(...frequencias);
+      const indicesModais = frequencias.reduce((acc, f, i) => {
+        if (f === fm) acc.push(i);
+        return acc;
+      }, []);
+
+      let modas = [];
+
+      indicesModais.forEach(indiceModal => {
+        const moda = pmi[indiceModal]; 
+        modas.push(moda.toFixed(2));
+      });
+
+      let texto = "";
+      const todasIguais = frequencias.every(f => f === frequencias[0]);
+
+      if (todasIguais) {
+        texto = "Conjunto amodal";
+      } else if (modas.length > 1) {
+        texto = "Modas (multimodal): " + modas.join(", ");
+      } else if (modas.length === 1) {
+        texto = "Moda: " + modas[0];
+      } else {
+        texto = "Não foi possível determinar a moda.";
+      }
+
+      document.getElementById(tab + "-resultado").innerText = texto;
+    }
+
+
+    function calcularModaCzuber() {
+      const tab = "tab7";
+      const dados = pegarDados(tab);
+      if (!dados) return;
+      const { frequencias, pmi } = dados;
+
+      const fm = Math.max(...frequencias);
+      const indicesModais = frequencias.reduce((acc, f, i) => {
+        if (f === fm) acc.push(i);
+        return acc;
+      }, []);
+
+      let modasCzuber = [];
+
+      let h = 0;
+      if (pmi.length > 1) {
+        h = pmi[1] - pmi[0];
+      }
+      if (h === 0) h = 1;
+
+      indicesModais.forEach(indiceModal => {
+        const fAntes = frequencias[indiceModal - 1] ?? 0;
+        const fDepois = frequencias[indiceModal + 1] ?? 0;
+        const L = pmi[indiceModal] - h / 2;
+
+        const d1 = fm - fAntes;
+        const d2 = fm - fDepois;
+        const soma = d1 + d2;
+
+        if (soma > 0) {
+          const moda = L + (d1 / soma) * h;
+          modasCzuber.push(moda.toFixed(2));
+        }
+      });
+
+      let texto = "";
+      const todasIguais = frequencias.every(f => f === frequencias[0]);
+
+      if (todasIguais) {
+        texto = "Conjunto amodal";
+      } else if (modasCzuber.length > 1) {
+        texto = "Modas de Czuber (multimodal): " + modasCzuber.join(", ");
+      } else if (modasCzuber.length === 1) {
+        texto = "Moda de Czuber: " + modasCzuber[0];
+      } else {
+        texto = "Não foi possível determinar a moda.";
+      }
+
+
+      document.getElementById(tab + "-resultado").innerText = texto;
+    }
+
+  </script>
+</body>
+
+</html>
