@@ -34,5 +34,6 @@ External CSS (disc.css, prog.css) and JS files for maintainability
 
 🚀 Getting Started
 
-git clone https://github.com/gabrielq2/my-curryculum/new/electron-app
+git clone https://github.com/gabrielq2/my-curryculum.git
+
 
