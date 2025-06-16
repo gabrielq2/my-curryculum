@@ -21,10 +21,7 @@ Probability region visualization and calculations: P(X < a), P(X > a), P(a < X <
 Frameless window with minimize, maximize, and close buttons
 
 Fully draggable and styled using titlebar.js and Electron IPC
-
-🐍 Python Script Integration
-
-Backend-ready to integrate Python scripts via Electron IPC (run-python-script handler)
+	
 
 📁 Modular & Scalable Codebase
 
@@ -34,6 +31,10 @@ External CSS (disc.css, prog.css) and JS files for maintainability
 
 🚀 Getting Started
 
-git clone https://github.com/gabrielq2/my-curryculum.git
+git clone https://github.com/gabrielq2/calcestic
+cd calcestic
+npm install
+npm start
+
 
 
